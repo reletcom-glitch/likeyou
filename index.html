@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="description" content="Like You - Plateforme sociale innovante dédiée au partage, à la créativité et à l'expérience utilisateur.">
+    <meta property="og:title" content="Like You - Plateforme Sociale" id="ogTitle">
+    <meta property="og:description" content="Innovation et expérience utilisateur - Partagez vos découvertes, vos créations et connectez-vous avec une communauté passionnée." id="ogDesc">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90' fill='%231877f2' font-weight='bold'%3E♥%3C/text%3E%3C/svg%3E" id="ogImage">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90' fill='%231877f2' font-weight='bold'%3E♥%3C/text%3E%3C/svg%3E">
+    <title>Like You - Plateforme Sociale</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script async src="https://cse.google.com/cse.js?cx=d5fa40c4aeb7a4fe6"></script>
+
+    <style>
+        
+:root {
+    --primary: #1877f2;
+    --primary-hover: #166fe5;
+    --bg: #f0f2f5;
+    --surface: #ffffff;
+    --text: #050505;
+    --text-secondary: #65676b;
+    --success: #2ecc71;
+    --warning: #f7b928;
+    --danger: #e41e3f;
+    --nav-bg: #ffffff;
+    --nav-text: #65676b;
+    --nav-active: #1877f2;
+    --border-subtle: #dadde1;
+    --shadow-card: 0 1px 3px rgba(0,0,0,0.12);
+    --card-bg: #ffffff;
+    --premium-gold: #d4af37;
+    --topbar-height: 56px;
+    --bottom-nav-height: 70px;
+}
+[data-theme="dark"] {
+    --primary: #1877f2;
+    --primary-hover: #4290f7;
+    --bg: #18191a;
+    --surface: #242526;
+    --text: #e4e6eb;
+    --text-secondary: #b0b3b8;
+    --nav-bg: #242526;
+    --nav-text: #b0b3b8;
+    --border-subtle: #3e4042;
+    --shadow-card: 0 1px 3px rgba(0,0,0,0.3);
+    --card-bg: #242526;
+}
+* {
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-touch-callout:none;
+    touch-action:manipulation;
+}
+html,body {
+    height:100%;
+    width:100%;
+    overflow:hidden;
+    position:fixed;
+    font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+}
+input,textarea {
+    -webkit-user-select:text;
+    user-select:text;
+    color: var(--text);
+    background: var(--surface);
+    outline:none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+input:focus, textarea:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 2px rgba(24,119,242,0.2);
+}
+a { color: var(--primary); text-decoration: none; }
+
+.toast-container {
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:9998;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    pointer-events:none;
+}
+.toast {
+    background:var(--surface);
+    border:1px solid var(--border-subtle);
+    color:var(--text);
+    padding:12px 20px;
+    border-radius:25px;
+    font-weight:600;
+    font-size:13px;
+    backdrop-filter:blur(20px);
+    animation:toastIn .35s ease,toastOut .35s ease 2.2s forwards;
+    pointer-events:auto;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.15);
+    max-width:90vw;
+}
+@keyframes toastIn { from { opacity:0; transform:translateY(-25px); } to { opacity:1; transform:translateY(0); } }
+@keyframes toastOut { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(-25px); } }
+
+.app-container {
+    height:100vh;height:-webkit-fill-available;width:100vw;
+    display:flex;flex-direction:column;position:relative;overflow:hidden;
+}
+
+.top-bar {
+    height:var(--topbar-height);
+    background:var(--surface);
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 16px;
+    border-bottom:1px solid var(--border-subtle);
+    z-index:200;position:relative;flex-shrink:0;
+}
+.top-bar-left { display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:900;font-size:20px;color:var(--primary);letter-spacing:-0.5px; }
+.top-bar-left i { font-size:24px;color:#e41e3f; }
+.top-bar-right { display:flex;align-items:center;gap:4px; }
+.top-bar-btn {
+    background:none;border:none;color:var(--text-secondary);font-size:24px;
+    cursor:pointer;width:40px;height:40px;display:flex;align-items:center;justify-content:center;
+    border-radius:50%;transition:background 0.2s;position:relative;
+}
+.top-bar-btn:active { background:rgba(0,0,0,0.05); }
+.notification-badge-top {
+    position:absolute;top:2px;right:2px;
+    background:var(--danger);color:white;font-size:10px;font-weight:700;
+    min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+    padding:0 4px;border:2px solid var(--surface);
+}
+.back-btn { display:none;margin-right:4px; }
+.back-btn.visible { display:flex; }
+
+.main-content {
+    flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding-bottom:8px;scroll-behavior:smooth;overscroll-behavior-y:contain;
+}
+.main-content::-webkit-scrollbar { display:none; }
+.page { display:none;padding:10px; }
+.page.active { display:block; }
+.page-header {
+    display:flex;align-items:center;justify-content:space-between;padding:12px 16px;gap:12px;
+}
+.page-header h3 { font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px;flex:1; }
+.page-search { padding:10px 16px; }
+.page-search input {
+    width:100%;padding:12px 16px;border-radius:25px;border:1px solid var(--border-subtle);
+    background:var(--surface);color:var(--text);font-size:14px;outline:none;
+}
+
+.bottom-nav {
+    height:var(--bottom-nav-height);background:var(--nav-bg);
+    display:flex;justify-content:space-around;align-items:center;
+    border-top:1px solid var(--border-subtle);z-index:150;flex-shrink:0;
+    padding-bottom:env(safe-area-inset-bottom,0);
+}
+.nav-item {
+    text-align:center;font-size:11px;color:var(--nav-text);cursor:pointer;flex:1;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    transition:all 0.2s;padding:6px 0;position:relative;
+}
+.nav-item i { font-size:24px;margin-bottom:1px;display:block; }
+.nav-item.active { color:var(--nav-active); }
+.nav-item .notification-badge {
+    position:absolute;top:2px;right:25%;background:var(--danger);color:white;font-size:10px;font-weight:700;
+    min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+    padding:0 5px;border:2px solid var(--nav-bg);
+}
+
+.auth-screen {
+    position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:9999;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;
+}
+.auth-screen.hidden { display:none; }
+.auth-screen .logo { font-size:72px;color:var(--primary);font-weight:900;margin-bottom:8px;line-height:1; }
+.auth-screen h1 { font-size:28px;margin-bottom:4px;color:var(--text); }
+.auth-screen p { color:var(--text-secondary);margin-bottom:32px;font-size:14px; }
+.auth-btn {
+    width:100%;max-width:320px;padding:14px;border-radius:28px;border:none;font-size:15px;font-weight:700;
+    cursor:pointer;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:10px;
+    transition:all 0.2s;background:var(--primary);color:white;
+}
+.auth-btn:active { transform:scale(0.97); }
+.auth-btn.google { background:#ffffff;color:#333;border:2px solid #dadde1; }
+.auth-btn.anonymous { background:var(--surface);color:var(--text);border:2px solid var(--border-subtle); }
+.auth-divider { display:flex;align-items:center;gap:12px;width:100%;max-width:320px;margin:16px auto;color:var(--text-secondary);font-size:12px; }
+.auth-divider::before,.auth-divider::after { content:'';flex:1;height:1px;background:var(--border-subtle); }
+.password-wrapper { position:relative;width:100%;max-width:320px;margin:0 auto 16px; }
+.password-wrapper input { padding-right:45px; }
+.password-wrapper .toggle-password {
+    position:absolute;right:12px;top:50%;transform:translateY(-50%);
+    background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:20px;
+}
+
+.post-card {
+    background:var(--card-bg);border-radius:12px;margin:8px 0;overflow:hidden;
+    box-shadow:var(--shadow-card);border:1px solid var(--border-subtle);
+    animation:fadeInUp 0.3s ease forwards;opacity:0;
+}
+@keyframes fadeInUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+.post-card-header { display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer; }
+.post-card-avatar {
+    width:42px;height:42px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;
+    color:#fff;background:var(--primary);overflow:hidden;
+}
+.post-card-avatar img { width:100%;height:100%;object-fit:cover; }
+.post-card-user { flex:1;min-width:0; }
+.post-card-username { font-weight:600;font-size:14px;color:var(--text);display:flex;align-items:center;gap:6px; }
+.premium-badge-small { font-size:10px;background:linear-gradient(135deg,#d4af37,#f0c75e);color:#1a1a1a;padding:2px 7px;border-radius:10px;font-weight:700; }
+.post-card-date { font-size:11px;color:var(--text-secondary); }
+.post-card-body { cursor:pointer;position:relative; }
+.post-card-img { width:100%;max-height:500px;object-fit:cover;display:block; }
+.post-card-text-bg {
+    padding:24px 16px;text-align:center;font-size:clamp(18px,4vw,26px);font-weight:700;
+    color:#fff;min-height:160px;display:flex;align-items:center;justify-content:center;word-break:break-word;
+}
+.post-card-description { padding:10px 14px;font-size:14px;color:var(--text); }
+.post-card-description .desc-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre-wrap;
+}
+.post-card-description .desc-text.expanded {
+    -webkit-line-clamp: unset;
+    overflow: visible;
+}
+.post-card-description .see-more-btn {
+    display: inline-block;
+    margin-top: 4px;
+    color: var(--primary);
+    font-size: 13px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-weight: 600;
+}
+.post-card-actions {
+    display:flex;justify-content:space-around;padding:6px 4px;
+    border-top:1px solid var(--border-subtle);margin:8px 10px 0;
+}
+.post-card-action-btn {
+    display:flex;align-items:center;gap:4px;background:none;border:none;
+    color:var(--text-secondary);font-size:13px;cursor:pointer;padding:8px 12px;
+    border-radius:8px;transition:all 0.2s;font-weight:500;
+}
+.post-card-action-btn:active { background:rgba(0,0,0,0.05);transform:scale(0.96); }
+.post-card-action-btn.liked { color:var(--primary)!important; }
+.post-card-action-btn.saved { color:#f7b928!important; }
+.post-card-action-btn .material-icons { font-size:20px; }
+.download-photo-btn {
+    position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);border:none;
+    color:white;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+}
+.linked-text { color:var(--primary);text-decoration:underline;cursor:pointer;word-break:break-all; }
+.phone-link { display:inline-flex;align-items:center;gap:4px;color:var(--success);text-decoration:none;font-weight:500;margin:0 2px; }
+.phone-link i { font-size:14px; }
+
+.user-list-item { display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border-subtle);cursor:pointer;transition:background 0.2s; }
+.user-list-item:last-child { border-bottom:none; }
+.user-list-item:active { background:rgba(0,0,0,0.03); }
+.user-list-avatar {
+    width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:20px;color:#fff;background:var(--primary);overflow:hidden;flex-shrink:0;
+}
+.user-list-avatar img { width:100%;height:100%;object-fit:cover; }
+.user-list-info { flex:1;min-width:0; }
+.user-list-name { font-weight:700;font-size:15px;color:var(--text); }
+.user-subscribe-btn {
+    padding:8px 14px;border-radius:20px;border:none;font-weight:700;font-size:12px;
+    cursor:pointer;transition:all 0.2s;flex-shrink:0;background:var(--primary);color:white;
+}
+.user-subscribe-btn.subscribed { background:rgba(0,0,0,0.05);color:var(--text-secondary); }
+
+.overlay-full {
+    position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:350;
+    display:none;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;
+}
+.overlay-full.active { display:flex; }
+.overlay-close-btn {
+    position:sticky;top:16px;left:16px;z-index:10;background:rgba(0,0,0,0.6);border:none;
+    color:white;width:44px;height:44px;border-radius:50%;font-size:24px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;margin-bottom:-44px;
+}
+
+.post-detail-overlay {
+    position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);z-index:400;
+    display:none;flex-direction:column;backdrop-filter:blur(8px);
+}
+.post-detail-overlay.active { display:flex; }
+.post-detail-content { flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;position:relative; }
+.post-detail-bg img { max-height:70vh;max-width:90vw;border-radius:12px;object-fit:contain; }
+.post-detail-text { position:relative;z-index:2;text-align:center;max-width:90vw;color:white;font-size:24px;font-weight:700;margin-top:20px; }
+.post-detail-close {
+    position:absolute;top:20px;left:20px;z-index:10;background:rgba(0,0,0,0.6);border:none;
+    color:white;width:44px;height:44px;border-radius:50%;font-size:24px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+}
+
+.chat-overlay {
+    position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:600;
+    display:none;flex-direction:column;
+}
+.chat-overlay.active { display:flex; }
+.chat-header { display:flex;align-items:center;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border-subtle);gap:10px; }
+.chat-messages { flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:10px; }
+.chat-message {
+    max-width:75%;padding:10px 14px;border-radius:18px;font-size:14px;
+    word-break:break-word;align-self:flex-start;background:var(--surface);
+    border:1px solid var(--border-subtle);color:var(--text);
+}
+.chat-message.own { align-self:flex-end;background:var(--primary);color:white;border:none; }
+.chat-input-area { display:flex;padding:10px;background:var(--surface);border-top:1px solid var(--border-subtle);gap:8px; }
+.chat-input-area input {
+    flex:1;padding:12px 16px;border-radius:25px;border:1px solid var(--border-subtle);
+    font-size:14px;outline:none;color:var(--text);background:var(--bg);
+}
+.chat-input-area button {
+    background:var(--primary);color:white;border:none;border-radius:50%;width:44px;height:44px;
+    font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:0.2s;
+}
+.chat-input-area button:active { transform:scale(0.92); }
+
+.modal-overlay {
+    position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:300;
+    display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);
+}
+.modal-overlay.active { display:flex; }
+.modal {
+    background:var(--surface);border-radius:20px;padding:24px;width:92vw;max-width:500px;
+    max-height:85vh;overflow-y:auto;box-shadow:0 12px 28px rgba(0,0,0,0.2);
+    border:1px solid var(--border-subtle);position:relative;color:var(--text);
+}
+.btn-primary {
+    width:100%;padding:14px;border:none;border-radius:24px;background:var(--primary);
+    color:white;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;transition:0.2s;
+}
+.btn-primary:active { transform:scale(0.97);background:var(--primary-hover); }
+.btn-close { position:absolute;top:14px;right:14px;background:none;border:none;color:var(--text-secondary);font-size:22px;cursor:pointer; }
+
+.profile-cover { position:relative;height:160px;background-size:cover;background-position:center;cursor:pointer; }
+.profile-pic-large {
+    position:absolute;bottom:-40px;left:18px;width:80px;height:80px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:bold;
+    border:4px solid var(--bg);overflow:hidden;background:var(--primary);color:white;cursor:pointer;
+}
+.profile-pic-large img { width:100%;height:100%;object-fit:cover; }
+.profile-info { padding:50px 18px 20px; }
+.profile-name-row { display:flex;align-items:center;gap:8px;flex-wrap:wrap; }
+.premium-badge { font-size:12px;background:linear-gradient(135deg,#d4af37,#f0c75e);color:#1a1a1a;padding:4px 10px;border-radius:12px;font-weight:700; }
+.profile-stats { display:flex;gap:18px;margin-top:14px;padding-bottom:14px;border-bottom:1px solid var(--border-subtle);flex-wrap:wrap; }
+.stat-item { cursor:pointer;text-align:center; }
+.stat-number { font-weight:700;font-size:16px;color:var(--text); }
+.stat-label { font-size:11px;color:var(--text-secondary); }
+
+.suggestions-section { margin:16px 0;padding:0 8px; }
+.suggestions-title { font-weight:600;font-size:15px;margin-bottom:8px;color:var(--text-secondary); }
+.suggestions-scroll { display:flex;overflow-x:auto;gap:12px;padding:8px 0; }
+.suggestion-card {
+    background:var(--surface);border-radius:12px;padding:12px;min-width:140px;
+    text-align:center;box-shadow:var(--shadow-card);border:1px solid var(--border-subtle);
+    cursor:pointer;flex-shrink:0;
+}
+.suggestion-avatar {
+    width:56px;height:56px;border-radius:50%;margin:0 auto 8px;
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;
+    color:white;background:var(--primary);overflow:hidden;
+}
+.suggestion-avatar img { width:100%;height:100%;object-fit:cover; }
+.suggestion-name { font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.suggestion-btn {
+    margin-top:8px;padding:6px 12px;border-radius:20px;border:none;background:var(--primary);
+    color:white;font-size:12px;font-weight:600;cursor:pointer;
+}
+.suggestion-btn.subscribed { background:rgba(0,0,0,0.05);color:var(--text-secondary); }
+
+.notifications-overlay {
+    position:fixed;top:var(--topbar-height);right:0;width:100%;max-width:400px;
+    height:calc(100vh - var(--topbar-height));background:var(--surface);z-index:450;
+    transform:translateX(100%);transition:transform 0.3s;overflow-y:auto;
+    border-left:1px solid var(--border-subtle);box-shadow:-5px 0 20px rgba(0,0,0,0.1);
+}
+.notifications-overlay.active { transform:translateX(0); }
+.notification-item { padding:14px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;gap:12px;cursor:pointer; }
+.notification-avatar {
+    width:40px;height:40px;border-radius:50%;background:var(--primary);display:flex;align-items:center;
+    justify-content:center;color:white;font-weight:600;overflow:hidden;
+}
+.notification-avatar img { width:100%;height:100%;object-fit:cover; }
+.notification-text { flex:1;font-size:14px; }
+.notification-time { font-size:11px;color:var(--text-secondary); }
+
+.review-item { padding:12px;border-bottom:1px solid var(--border-subtle); }
+.review-author { font-weight:600; }
+.review-text { margin:4px 0;font-size:14px; }
+
+.search-overlay {
+    position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:500;
+    display:none;flex-direction:column;
+}
+.search-overlay.active { display:flex; }
+.search-overlay .search-header {
+    display:flex;align-items:center;padding:10px 16px;background:var(--surface);
+    border-bottom:1px solid var(--border-subtle);gap:10px;
+}
+.search-overlay .search-header input {
+    flex:1;padding:12px 16px;border-radius:25px;border:1px solid var(--border-subtle);
+    background:var(--bg);font-size:14px;outline:none;color:var(--text);
+}
+.search-tabs { display:flex;border-bottom:1px solid var(--border-subtle);background:var(--surface); }
+.search-tab {
+    flex:1;text-align:center;padding:12px;font-weight:600;font-size:13px;cursor:pointer;
+    color:var(--text-secondary);border-bottom:2px solid transparent;transition:all 0.2s;
+}
+.search-tab.active { color:var(--primary);border-bottom-color:var(--primary); }
+.search-results { flex:1;overflow-y:auto;padding:10px; }
+
+.color-simple-grid { display:flex;gap:8px;flex-wrap:wrap; }
+.color-simple-option {
+    width:40px;height:40px;border-radius:12px;cursor:pointer;border:3px solid transparent;
+    transition:transform 0.2s, border-color 0.2s;
+}
+.color-simple-option:active { transform:scale(0.9); }
+.color-simple-option.selected { border-color:var(--primary); }
+.image-upload-area {
+    border:2px dashed var(--border-subtle);border-radius:14px;padding:30px;text-align:center;
+    cursor:pointer;margin-bottom:16px;color:var(--text-secondary);transition:border-color 0.2s;
+}
+.image-upload-area:active { border-color:var(--primary); }
+.image-preview { width:100%;height:auto;border-radius:10px;margin-top:10px;max-height:200px;object-fit:contain; }
+
+.form-group { margin-bottom:16px; }
+.form-group label { display:block;font-size:12px;color:var(--text-secondary);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px; }
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width:100%;padding:13px 16px;border-radius:14px;border:1px solid var(--border-subtle);
+    background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;
+}
+.form-group textarea { resize:vertical;min-height:70px;max-height:140px; }
+.radio-group { display:flex;gap:16px;align-items:center; }
+.link-text { color:var(--primary);font-size:13px;text-decoration:underline;cursor:pointer; }
+.checkbox-label { display:flex;align-items:center;gap:8px;color:var(--text); }
+.whatsapp-btn {
+    display:inline-flex;align-items:center;gap:8px;background:#25D366;color:white;
+    border:none;padding:10px 18px;border-radius:22px;font-weight:700;font-size:13px;
+    cursor:pointer;text-decoration:none;margin-top:10px;transition:0.2s;
+}
+.whatsapp-btn i { font-size:18px; }
+.whatsapp-btn:active { transform:scale(0.95); }
+.activity-item { padding:12px 16px;border-bottom:1px solid var(--border-subtle);font-size:14px;display:flex;align-items:center;gap:12px;color:var(--text);cursor:pointer; }
+.activity-item:active { background:rgba(0,0,0,0.03); }
+
+.menu-section { padding:0 16px; }
+.menu-item {
+    display:flex;align-items:center;gap:15px;padding:16px 12px;
+    border-bottom:1px solid var(--border-subtle);cursor:pointer;transition:background 0.2s;
+    font-size:15px;font-weight:500;color:var(--text);
+}
+.menu-item:last-child { border-bottom:none; }
+.menu-item:active { background:rgba(0,0,0,0.03); }
+.menu-item .menu-icon { width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px; }
+.menu-item .menu-label { flex:1; }
+.menu-item .menu-arrow { color:var(--text-secondary);font-size:20px; }
+
+.icon-edit { background:#e3f2fd;color:#1877f2; }
+.icon-activity { background:#e8f5e9;color:#2ecc71; }
+.icon-hidden { background:#fff3e0;color:#f7b928; }
+.icon-premium { background:#fff8e1;color:#d4af37; }
+.icon-logout { background:#ffebee;color:#e41e3f; }
+.icon-info { background:#f3e5f5;color:#8a3ab9; }
+.icon-confidentialite { background:#e0f7fa;color:#00796b; }
+.icon-contact { background:#fff9c4;color:#f57f17; }
+.icon-theme { background:#e8eaf6;color:#3f51b5; }
+
+.app-description-tooltip { line-height:1.5; }
+.pull-to-refresh { text-align:center;padding:12px;color:var(--text-secondary);font-size:12px;display:none; }
+            
+    </style>
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- AUTH SCREEN -->
+<div class="auth-screen hidden" id="authScreen">
+    <div class="logo">2026</div>
+    <h1>Like You</h1>
+    <p>Innovation et expérience utilisateur – rejoignez la communauté</p>
+    <div id="authScreenContent">
+        <button type="button" class="auth-btn google" onclick="loginWithGoogle()"><i class="fab fa-google"></i> Continuer avec Google</button>
+        <div class="auth-divider">ou</div>
+        <div class="form-group"><input type="email" id="loginEmail" placeholder="Email"></div>
+        <div class="password-wrapper">
+            <input type="password" id="loginPassword" placeholder="Mot de passe">
+            <button type="button" class="toggle-password" onclick="togglePassword('loginPassword',this)"><i class="material-icons">visibility_off</i></button>
+        </div>
+        <button type="button" class="auth-btn email" onclick="loginWithEmail()">Se connecter</button>
+        <button type="button" class="auth-btn anonymous" onclick="loginAnonymously()"><i class="material-icons">person_outline</i> Continuer en tant qu'invité</button>
+        <p style="margin-top:12px;">Pas de compte ? <span class="link-text" onclick="switchAuthTab('register')">Créer un compte</span></p>
+    </div>
+    <div id="registerScreenContent" style="display:none;">
+        <div class="form-group"><input type="text" id="regName" placeholder="Nom complet"></div>
+        <div class="form-group"><input type="email" id="regEmail" placeholder="Email"></div>
+        <div class="password-wrapper">
+            <input type="password" id="regPassword" placeholder="Mot de passe (min 6 car.)">
+            <button type="button" class="toggle-password" onclick="togglePassword('regPassword',this)"><i class="material-icons">visibility_off</i></button>
+        </div>
+        <button type="button" class="btn-primary" onclick="registerWithEmail()">Créer un compte</button>
+        <p style="margin-top:12px;">Déjà un compte ? <span class="link-text" onclick="switchAuthTab('login')">Se connecter</span></p>
+    </div>
+</div>
+
+<!-- APPLICATION PRINCIPALE -->
+<div class="app-container" id="appContainer" style="display:none;">
+    <div class="top-bar" id="topBar">
+        <div class="top-bar-left" id="appTitleBtn" onclick="toggleAppDescription()">
+            <i class="material-icons">favorite</i> Like You
+        </div>
+        <div class="top-bar-right">
+            <button class="top-bar-btn" onclick="openNotifications()" title="Notifications">
+                <i class="material-icons">notifications</i>
+                <span class="notification-badge-top" id="notifBadgeTop" style="display:none;">0</span>
+            </button>
+            <button class="top-bar-btn" onclick="openSearch()" title="Rechercher"><i class="material-icons">search</i></button>
+            <button class="top-bar-btn" onclick="refreshFeed()" title="Actualiser"><i class="material-icons">refresh</i></button>
+        </div>
+    </div>
+
+    <div class="notifications-overlay" id="notificationsOverlay"></div>
+    <div class="app-description-tooltip" id="appDescriptionTooltip" style="display:none;position:absolute;top:56px;left:0;right:0;background:var(--surface);padding:16px;border-bottom:1px solid var(--border-subtle);z-index:250;">
+        Like You est une plateforme sociale dédiée à l'<strong>innovation</strong> et à l'<strong>expérience utilisateur</strong>.
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="page active" id="page-feed">
+            <div class="pull-to-refresh" id="subPullRefresh" style="display:none;text-align:center;padding:12px;">↓ Relâcher pour rafraîchir</div>
+            <div id="subscriptionsContent"></div>
+            <div id="suggestionsSection" class="suggestions-section" style="display:none;"></div>
+            <div id="feedEnd" style="display:none;text-align:center;padding:20px;color:var(--text-secondary);">— Fin du fil —</div>
+        </div>
+        <div class="page" id="page-users">
+            <div class="page-header"><h3><i class="material-icons">groups</i> Utilisateurs</h3></div>
+            <div class="page-search"><input type="text" id="userSearchInput" placeholder="Rechercher un utilisateur..." oninput="searchUsers()"></div>
+            <div id="usersList"></div>
+        </div>
+        <div class="page" id="page-create">
+            <div class="page-header"><h3><i class="material-icons">add_box</i> Créer une publication</h3></div>
+            <div id="createContent"></div>
+        </div>
+        <div class="page" id="page-profile">
+            <div id="profileContent"></div>
+        </div>
+        <div class="page" id="page-menu">
+            <div id="menuContent"></div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" data-page="feed" onclick="navigateTo('feed')"><i class="material-icons">home</i> Fil</div>
+        <div class="nav-item" data-page="users" onclick="navigateTo('users')"><i class="material-icons">groups</i> Utilisateurs</div>
+        <div class="nav-item" data-page="create" onclick="navigateTo('create')"><i class="material-icons">add_box</i> Créer</div>
+        <div class="nav-item" data-page="profile" onclick="navigateTo('profile')"><i class="material-icons">person</i> Profil<span class="notification-badge" id="navNotificationBadge" style="display:none;">0</span></div>
+        <div class="nav-item" data-page="menu" onclick="navigateTo('menu')"><i class="material-icons">menu</i> Menu</div>
+    </div>
+</div>
+
+<!-- OVERLAYS -->
+<div class="post-detail-overlay" id="postDetailOverlay">
+    <button class="post-detail-close" onclick="closePostDetail()"><i class="material-icons">close</i></button>
+    <div class="post-detail-content">
+        <div class="post-detail-bg" id="postDetailBg"></div>
+        <div class="post-detail-text" id="postDetailText"></div>
+    </div>
+</div>
+
+<div class="overlay-full" id="visitorProfileOverlay">
+    <button class="overlay-close-btn" onclick="closeVisitorProfile()"><i class="material-icons">close</i></button>
+    <div id="visitorProfileContent"></div>
+</div>
+
+<div class="chat-overlay" id="chatOverlay">
+    <div class="chat-header">
+        <button onclick="closeChat()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--text);"><i class="material-icons">arrow_back</i></button>
+        <span id="chatTitle" style="font-weight:700;color:var(--text);">Discussion</span>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-area">
+        <input type="text" id="chatInput" placeholder="Message...">
+        <button type="button" id="chatSendBtn" onclick="sendChatMessage()"><i class="material-icons">send</i></button>
+    </div>
+</div>
+
+<div class="search-overlay" id="searchOverlay">
+    <div class="search-header">
+        <button onclick="closeSearch()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--text);"><i class="material-icons">arrow_back</i></button>
+        <input type="text" id="searchOverlayInput" placeholder="Rechercher..." oninput="performSearch()">
+    </div>
+    <div class="search-tabs">
+        <div class="search-tab active" data-search-tab="publications" onclick="switchSearchTab('publications')">Publications</div>
+        <div class="search-tab" data-search-tab="autres" onclick="switchSearchTab('autres')">Autres</div>
+    </div>
+    <div class="search-results" id="searchResults">
+        <div id="searchResultsPublications"></div>
+        <div id="searchResultsAutres" style="display:none;"><div class="gcse-search"></div></div>
+    </div>
+</div>
+
+<!-- MODALES -->
+<div class="modal-overlay" id="conditionsModal"><div class="modal"><button class="btn-close" onclick="closeConditions()"><i class="material-icons">close</i></button><h3>Conditions d'utilisation</h3><p>En utilisant Like You, vous acceptez nos conditions.</p></div></div>
+<div class="modal-overlay" id="completeProfileModal"><div class="modal"><h3>Complète ton profil</h3><div class="form-group"><label>Prénom</label><input type="text" id="cpFirstName"></div><div class="form-group"><label>Nom</label><input type="text" id="cpLastName"></div><div class="form-group"><label>Date de naissance</label><input type="date" id="cpBirthdate"></div><div class="form-group"><label>Genre</label><div class="radio-group"><label><input type="radio" name="cpGender" value="homme"> Homme</label><label><input type="radio" name="cpGender" value="femme"> Femme</label><label><input type="radio" name="cpGender" value="autre"> Autre</label></div></div><div class="form-group"><label>Pays</label><select id="cpCountry"></select></div><p class="link-text" onclick="openConditions()">Pourquoi ces informations ?</p><label class="checkbox-label"><input type="checkbox" id="cpAcceptConditions"> J'accepte les conditions</label><button class="btn-primary" onclick="submitCompleteProfile()">Enregistrer</button></div></div>
+<div class="modal-overlay" id="shareModal"><div class="modal"><button class="btn-close" onclick="closeShareModal()"><i class="material-icons">close</i></button><h3>Partager</h3><div id="qrContainer"></div></div></div>
+<div class="modal-overlay" id="commentsOverlay"><div class="modal"><button class="btn-close" onclick="closeComments()"><i class="material-icons">close</i></button><h3>Commentaires</h3><div id="commentsList" style="max-height:40vh;overflow-y:auto;"></div><div style="display:flex;gap:8px;margin-top:8px;"><input type="text" id="commentInput" placeholder="Ajouter..."><button onclick="addComment()" style="background:var(--primary);color:white;border:none;border-radius:18px;padding:10px 16px;">Envoyer</button></div></div></div>
+<div class="modal-overlay" id="editPostModal"><div class="modal"><button class="btn-close" onclick="closeEditPostModal()"><i class="material-icons">close</i></button><h3>Modifier</h3><input type="hidden" id="editPostId"><textarea id="editDescription" maxlength="500"></textarea><button class="btn-primary" onclick="saveEditedPost()">Enregistrer</button></div></div>
+<div class="modal-overlay" id="hiddenPostsModal"><div class="modal"><button class="btn-close" onclick="closeHiddenPosts()"><i class="material-icons">close</i></button><h3>Masquées</h3><div id="hiddenPostsList"></div></div></div>
+<div class="modal-overlay" id="editProfileModal"><div class="modal"><button class="btn-close" onclick="closeEditProfile()"><i class="material-icons">close</i></button><h3>Éditer profil</h3><div class="form-group"><label>Nom</label><input type="text" id="editName" placeholder="Nom complet"></div><div class="form-group"><label>Bio</label><textarea id="editBio" maxlength="200" placeholder="Bio"></textarea></div><div class="form-group"><label>Numéro WhatsApp</label><input type="tel" id="editWhatsapp" placeholder="+33612345678"></div><button class="btn-primary" onclick="saveProfile()">Enregistrer</button></div></div>
+<div class="modal-overlay" id="premiumModal"><div class="modal"><button class="btn-close" onclick="closePremiumModal()"><i class="material-icons">close</i></button><h2>Premium</h2><p>7,99 €</p><button class="btn-primary" onclick="goToPremiumPayment()">Payer avec PayPal</button></div></div>
+<div class="modal-overlay" id="confidentialityModal"><div class="modal"><button class="btn-close" onclick="closeConfidentiality()"><i class="material-icons">close</i></button><h3>Confidentialité</h3><div class="form-group"><label>Qui peut voir ma photo de profil</label><select id="confProfileVisibility"><option value="public">Public</option><option value="private">Privé</option></select></div><div class="form-group"><label>Qui peut voir mes publications</label><select id="confPostsVisibility"><option value="public">Public</option><option value="private">Privé</option></select></div><button class="btn-primary" onclick="saveConfidentiality()">Enregistrer</button></div></div>
+<div class="modal-overlay" id="infoModal"><div class="modal"><button class="btn-close" onclick="closeInfoModal()"><i class="material-icons">close</i></button><h3>À propos</h3><p>Like You est une plateforme de partage d'innovation et d'expérience utilisateur.</p></div></div>
+<div class="modal-overlay" id="contactModal"><div class="modal"><button class="btn-close" onclick="closeContactModal()"><i class="material-icons">close</i></button><h3>Contacter les développeurs</h3><p><i class="fab fa-whatsapp"></i> WhatsApp : <a href="https://wa.me/243977429008" target="_blank">+243977429008</a></p></div></div>
+<div class="modal-overlay" id="listModal"><div class="modal"><button class="btn-close" onclick="closeListModal()"><i class="material-icons">close</i></button><h3 id="listModalTitle">Liste</h3><div id="listModalContent" style="max-height:50vh;overflow-y:auto;"></div></div></div>
+<div class="modal-overlay" id="accountModal"><div class="modal"><button class="btn-close" onclick="closeAccountModal()"><i class="material-icons">close</i></button><h3>Compte</h3><div id="accountInfo"></div></div></div>
+<div class="modal-overlay" id="reviewsModal"><div class="modal"><button class="btn-close" onclick="closeReviewsModal()"><i class="material-icons">close</i></button><h3>Avis</h3><div id="reviewsList" style="max-height:40vh;overflow-y:auto;"></div><div style="display:flex;gap:8px;margin-top:8px;"><input type="text" id="reviewInput" placeholder="Votre avis (max 120)" maxlength="120"><button onclick="submitReview()" style="background:var(--primary);color:white;border:none;border-radius:18px;padding:10px 16px;">Publier</button></div></div></div>
+<div class="modal-overlay" id="thanksModal"><div class="modal"><button class="btn-close" onclick="closeThanksModal()"><i class="material-icons">close</i></button><h3>Mentions et Remerciements</h3><p>Nous remercions chaleureusement : Firebase, Google Fonts, Font Awesome, Material Icons, html2canvas, QRCode.js, les développeurs open source et toutes les technologies qui ont rendu cette application possible.</p></div></div>
+
+<!-- Zone capture -->
+<div id="captureArea" style="position:fixed;left:-9999px;top:-9999px;width:1080px;height:1920px;"></div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyB0YdJlwyvGhoaoP_9sJvuiMdShTX5qi8Y",
+        authDomain: "short-txt.firebaseapp.com",
+        databaseURL: "https://short-txt-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "short-txt",
+        storageBucket: "short-txt.firebasestorage.app",
+        messagingSenderId: "607499095610",
+        appId: "1:607499095610:web:e981c8d052a0a9707e2f03"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{});
+
+    const PRO_COLORS = ['#1877f2','#42b72a','#f7b928','#e41e3f','#8a3ab9','#ff8c00','#20c997','#6c757d'];
+    let isLoggedIn = false;
+    let accounts = [];
+    let posts = [];
+    let currentUser = null;
+    let currentPostId = null;
+    let nextId = 1;
+    let selectedColor = '#1877f2';
+    let uploadedPhotoData = null;
+    let profileViewingUser = null;
+    let newFollowersCount = 0;
+    let hiddenPosts = [];
+    let countriesList = [];
+    let currentPage = 'feed';
+    let isRefreshing = false;
+    let chatWithEmail = null;
+    let chatListener = null;
+    let sendingMessage = false;
+    let currentSearchTab = 'publications';
+    let pageStack = ['feed'];
+    let autoThemeEnabled = true;
+    let themeCheckInterval = null;
+    let unreadNotifications = 0;
+    let notifications = [];
+
+    function showToast(m,t='info'){
+        const c=document.getElementById('toastContainer');
+        const d=document.createElement('div');
+        d.className=`toast ${t}`;
+        d.textContent=m;
+        c.appendChild(d);
+        setTimeout(()=>d.remove(),2500);
+    }
+    function formatNumber(n){
+        if(n>=1000000)return (n/1000000).toFixed(1).replace('.0','')+'M';
+        if(n>=1000)return (n/1000).toFixed(1).replace('.0','')+'K';
+        return String(n||0);
+    }
+    function timeAgo(d){
+        if(!d)return'';
+        const n=new Date();
+        const p=new Date(d.split('/').reverse().join('-'));
+        if(isNaN(p))return d;
+        const s=Math.floor((n-p)/1000);
+        if(s<60)return'À l\'instant';
+        const m=Math.floor(s/60);
+        if(m<60)return`Il y a ${m} min`;
+        const h=Math.floor(m/60);
+        if(h<24)return`Il y a ${h}h`;
+        const j=Math.floor(h/24);
+        if(j<7)return`Il y a ${j} j`;
+        return d;
+    }
+    function escapeHTML(s){
+        const d=document.createElement('div');
+        d.appendChild(document.createTextNode(s));
+        return d.innerHTML;
+    }
+    function playLikeSound(){
+        try{
+            const a=new(window.AudioContext||window.webkitAudioContext)();
+            const o=a.createOscillator();
+            const g=a.createGain();
+            o.connect(g);g.connect(a.destination);
+            o.frequency.setValueAtTime(800,a.currentTime);
+            o.frequency.exponentialRampToValueAtTime(1200,a.currentTime+0.15);
+            g.gain.setValueAtTime(0.3,a.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.01,a.currentTime+0.3);
+            o.start(a.currentTime);o.stop(a.currentTime+0.3);
+        }catch(e){}
+    }
+    function playSaveSound(){
+        try{
+            const a=new(window.AudioContext||window.webkitAudioContext)();
+            const o=a.createOscillator();
+            const g=a.createGain();
+            o.connect(g);g.connect(a.destination);
+            o.frequency.setValueAtTime(600,a.currentTime);
+            o.frequency.exponentialRampToValueAtTime(900,a.currentTime+0.1);
+            g.gain.setValueAtTime(0.2,a.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.01,a.currentTime+0.2);
+            o.start(a.currentTime);o.stop(a.currentTime+0.2);
+        }catch(e){}
+    }
+    function linkifyText(text) {
+        if (!text) return '';
+        let escaped = escapeHTML(text);
+        escaped = escaped.replace(/(\b(https?|ftp):\/\/[^\s<]+)/gi, '<a href="$1" target="_blank" rel="noopener noreferrer" class="linked-text">$1</a>');
+        escaped = escaped.replace(/(\bwww\.[^\s<]+)/gi, '<a href="http://$1" target="_blank" rel="noopener noreferrer" class="linked-text">$1</a>');
+        escaped = escaped.replace(/(\+?\d{1,4}[\s-]?)?(\d{2,4}[\s-]?\d{2,4}[\s-]?\d{2,4}[\s-]?\d{2,4})/g, (match) => {
+            const cleaned = match.replace(/[\s-]/g, '');
+            if (cleaned.length >= 7 && /^\+?\d+$/.test(cleaned)) {
+                return `<a href="tel:${cleaned}" class="phone-link"><i class="material-icons" style="font-size:14px;">phone</i>${match}</a> <a href="https://wa.me/${cleaned}" target="_blank" class="phone-link" style="color:#25D366;"><i class="fab fa-whatsapp"></i></a>`;
+            }
+            return match;
+        });
+        return escaped;
+    }
+    function getPostByKey(k){return posts.find(p=>p.firebaseKey===k);}
+    function savePostToFirebase(p){
+        if(p.firebaseKey){const k=p.firebaseKey;const u={...p};delete u.firebaseKey;return db.ref('posts/'+k).update(u);}
+        else{const r=db.ref('posts').push();p.firebaseKey=r.key;const s={...p};delete s.firebaseKey;return r.set(s);}
+    }
+    function deletePostFromFirebase(k){return db.ref('posts/'+k).remove();}
+    function saveAccountToFirebase(a){
+        if(a.firebaseKey){const k=a.firebaseKey;const u={...a};delete u.firebaseKey;return db.ref('accounts/'+k).update(u);}
+        else{const r=db.ref('accounts').push();a.firebaseKey=r.key;const s={...a};delete s.firebaseKey;return r.set(s);}
+    }
+    function getDefaultUser(){
+        return{
+            firstName:'',lastName:'',name:'',username:'',birthdate:'',gender:'',country:'',
+            profileCompleted:false,email:'',avatarUrl:'',bio:'',coverColor:'#1877f2',
+            coverUrl:'',followers:0,following:[],newFollowers:0,hiddenPosts:[],
+            isPremium:false,whatsapp:'',profileVisibility:'public',postsVisibility:'public',
+            lastNameChange:0,lastPhotoChange:0,isAnonymous:false
+        };
+    }
+    async function fetchCountries(){
+        try{
+            const r=await fetch('https://restcountries.com/v3.1/all?fields=name,cca2');
+            const d=await r.json();
+            countriesList=d.map(c=>({name:c.name.common,code:c.cca2})).sort((a,b)=>a.name.localeCompare(b.name));
+        }catch(e){countriesList=[{name:'France',code:'FR'},{name:'Canada',code:'CA'}];}
+    }
+    function populateCountrySelect(id,sel=''){
+        const s=document.getElementById(id);if(!s)return;
+        s.innerHTML=countriesList.map(c=>`<option value="${c.code}" ${c.code===sel?'selected':''}>${c.name}</option>`).join('');
+    }
+    function getAge(b){
+        const t=new Date();const bd=new Date(b);
+        let a=t.getFullYear()-bd.getFullYear();
+        const m=t.getMonth()-bd.getMonth();
+        if(m<0||(m===0&&t.getDate()<bd.getDate()))a--;
+        return a;
+    }
+    async function isUsernameTaken(username,excludeEmail=null){
+        const snap=await db.ref('accounts').orderByChild('username').equalTo(username).once('value');
+        if(!snap.exists())return false;
+        const vals=snap.val();
+        if(excludeEmail)return Object.values(vals).some(a=>a.email!==excludeEmail);
+        return true;
+    }
+    async function suggestUniqueUsername(base){
+        let candidate=base.toLowerCase().replace(/[^a-z0-9_]/g,'_').substring(0,20)||'user';
+        if(!(await isUsernameTaken(candidate,currentUser?.email)))return candidate;
+        let i=1;while(await isUsernameTaken(candidate+i,currentUser?.email)&&i<1000)i++;
+        return candidate+i;
+    }
+    function togglePassword(id,btn){
+        const i=document.getElementById(id);
+        if(i.type==='password'){i.type='text';btn.innerHTML='<i class="material-icons">visibility</i>';}
+        else{i.type='password';btn.innerHTML='<i class="material-icons">visibility_off</i>';}
+    }
+    function initializePosts(){
+        db.ref('posts').once('value',snap=>{
+            posts=[];
+            if(snap.exists()){const d=snap.val();Object.keys(d).forEach(k=>posts.push({firebaseKey:k,...d[k]}));}
+            nextId=posts.reduce((m,p)=>Math.max(m,p.id||0),0)+1;
+            if(currentPage==='feed')renderFeed();
+        });
+        db.ref('posts').on('child_added',snap=>{
+            const p={firebaseKey:snap.key,...snap.val()};
+            if(!posts.find(x=>x.firebaseKey===snap.key)){
+                posts.push(p);
+                nextId=Math.max(nextId,(p.id||0)+1);
+                if(currentPage==='feed'){const c=document.getElementById('subscriptionsContent');if(c)c.prepend(buildPostCardElement(p,0));}
+            }
+        });
+        db.ref('posts').on('child_removed',snap=>{
+            posts=posts.filter(p=>p.firebaseKey!==snap.key);
+            if(currentPage==='feed'){const el=document.querySelector(`.post-card[data-key="${snap.key}"]`);if(el)el.remove();}
+        });
+    }
+    function loadAccounts(){
+        return db.ref('accounts').once('value').then(snap=>{
+            accounts=[];
+            if(snap.exists()){const d=snap.val();Object.keys(d).forEach(k=>accounts.push({firebaseKey:k,...d[k]}));}
+        });
+    }
+    function navigateTo(page,pushHistory=true){
+        if(!isLoggedIn||!currentUser?.profileCompleted){
+            document.getElementById('authScreen').classList.remove('hidden');
+            document.getElementById('appContainer').style.display='none';
+            return;
+        }
+        if(pushHistory&&pageStack[pageStack.length-1]!==page)pageStack.push(page);
+        currentPage=page;
+        document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+        const el=document.getElementById('page-'+page);if(el)el.classList.add('active');
+        const nav=document.querySelector(`.nav-item[data-page="${page}"]`);if(nav)nav.classList.add('active');
+        if(page==='profile')openProfileView();
+        else if(page==='feed')renderFeed();
+        else if(page==='users')renderUsersList();
+        else if(page==='create')renderCreateForm();
+        else if(page==='menu')renderMenu();
+        document.getElementById('mainContent').scrollTop=0;
+        updateBackButtonVisibility();
+    }
+    function goBack(){
+        if(pageStack.length>1){pageStack.pop();navigateTo(pageStack[pageStack.length-1],false);}
+        else navigateTo('feed',false);
+    }
+    function updateBackButtonVisibility(){
+        let btn=document.getElementById('topBarBackBtn');
+        if(!btn){
+            const tb=document.getElementById('topBar');
+            btn=document.createElement('button');
+            btn.id='topBarBackBtn';btn.className='top-bar-btn back-btn';
+            btn.innerHTML='<i class="material-icons">arrow_back</i>';
+            btn.onclick=goBack;
+            tb.insertBefore(btn,tb.firstChild);
+        }
+        btn.classList.toggle('visible',pageStack.length>1);
+    }
+    function toggleAppDescription(){document.getElementById('appDescriptionTooltip').classList.toggle('visible');}
+
+    function applyThemeBasedOnTime(){
+        if(!autoThemeEnabled)return;
+        const h=new Date().getHours();
+        document.documentElement.setAttribute('data-theme',(h>=18||h<6)?'dark':'light');
+    }
+    function initAutoTheme(){
+        autoThemeEnabled=localStorage.getItem('shorttxt_auto_theme')!=='false';
+        if(autoThemeEnabled){applyThemeBasedOnTime();if(themeCheckInterval)clearInterval(themeCheckInterval);themeCheckInterval=setInterval(applyThemeBasedOnTime,60000);}
+    }
+
+    function addNotification(type,fromEmail,postKey){
+        if(!currentUser||fromEmail===currentUser.email)return;
+        const notif={type,from:fromEmail,postKey,read:false,timestamp:Date.now()};
+        db.ref(`notifications/${currentUser.email.replace(/\./g,'_')}`).push(notif);
+    }
+    function loadNotifications(){
+        if(!currentUser)return;
+        db.ref(`notifications/${currentUser.email.replace(/\./g,'_')}`).on('value',snap=>{
+            notifications=[];unreadNotifications=0;
+            if(snap.exists()){
+                const data=snap.val();
+                Object.keys(data).forEach(k=>{const n=data[k];if(!n.read)unreadNotifications++;notifications.push({key:k,...n});});
+            }
+            updateNotificationBadges();
+            renderNotificationsPanel();
+        });
+    }
+    function updateNotificationBadges(){
+        document.getElementById('notifBadgeTop').style.display=unreadNotifications>0?'flex':'none';
+        document.getElementById('notifBadgeTop').textContent=Math.min(unreadNotifications,99);
+        document.getElementById('navNotificationBadge').style.display=newFollowersCount>0?'flex':'none';
+        document.getElementById('navNotificationBadge').textContent=Math.min(newFollowersCount,99);
+    }
+    function openNotifications(){
+        const panel=document.getElementById('notificationsOverlay');
+        panel.classList.toggle('active');
+        if(panel.classList.contains('active')) renderNotificationsPanel();
+    }
+    function renderNotificationsPanel(){
+        const panel=document.getElementById('notificationsOverlay');
+        if(!panel.classList.contains('active'))return;
+        panel.innerHTML='<div style="padding:16px;font-weight:700;border-bottom:1px solid var(--border-subtle);display:flex;justify-content:space-between;">Notifications <button onclick="closeNotifications()" style="background:none;border:none;color:var(--text);"><i class="material-icons">close</i></button></div>';
+        if(notifications.length===0)panel.innerHTML+='<div style="padding:20px;text-align:center;color:var(--text-secondary);">Aucune notification</div>';
+        else{
+            notifications.sort((a,b)=>b.timestamp-a.timestamp);
+            notifications.forEach(n=>{
+                const fromUser=accounts.find(a=>a.email===n.from)||{name:'Inconnu',avatarUrl:''};
+                let text='';switch(n.type){case 'like':text='a aimé votre publication';break;case 'comment':text='a commenté votre publication';break;case 'save':text='a ajouté votre publication aux favoris';break;}
+                const div=document.createElement('div');div.className='notification-item';
+                div.innerHTML=`<div class="notification-avatar">${fromUser.avatarUrl?`<img src="${fromUser.avatarUrl}">`:(fromUser.name||'?').charAt(0)}</div><div class="notification-text"><strong>${fromUser.name||'Utilisateur'}</strong> ${text}</div><div class="notification-time">${timeAgo(new Date(n.timestamp).toISOString())}</div>`;
+                div.onclick=()=>{db.ref(`notifications/${currentUser.email.replace(/\./g,'_')}/${n.key}`).update({read:true});const p=getPostByKey(n.postKey);if(p)openPostDetail(n.postKey);closeNotifications();};
+                panel.appendChild(div);
+            });
+        }
+    }
+    function closeNotifications(){document.getElementById('notificationsOverlay').classList.remove('active');}
+
+    function getSuggestedUsers(){
+        if(!currentUser)return[];
+        const following=currentUser.following||[];
+        return accounts.filter(a=>a.email!==currentUser.email&&!following.includes(a.email)&&!a.isAnonymous).slice(0,10);
+    }
+    function renderSuggestions(){
+        const section=document.getElementById('suggestionsSection');
+        const users=getSuggestedUsers();
+        if(users.length===0){section.style.display='none';return;}
+        section.style.display='block';
+        section.innerHTML=`<div class="suggestions-title">Suggestions pour vous</div><div class="suggestions-scroll">${users.map(u=>`<div class="suggestion-card" onclick="openVisitorProfile('${u.email}')"><div class="suggestion-avatar">${u.avatarUrl?`<img src="${u.avatarUrl}">`:(u.name||u.firstName||'?').charAt(0)}</div><div class="suggestion-name">${u.name||u.firstName||'Utilisateur'}</div><button class="suggestion-btn" onclick="event.stopPropagation();toggleFollowVisitor('${u.email}')">${(currentUser.following||[]).includes(u.email)?'Abonné ✓':'S\'abonner'}</button></div>`).join('')}</div>`;
+    }
+
+    function buildPostCardElement(p,i){
+        const card=document.createElement('div');card.className='post-card';card.style.animationDelay=(i*0.03)+'s';card.setAttribute('data-key',p.firebaseKey);
+        const av=p.avatarUrl?`<img src="${p.avatarUrl}" alt="">`:(p.author||'?').charAt(0);
+        const linkedText=linkifyText(p.text||'');
+        const descText=`<div class="desc-text">${linkedText}</div>${linkedText.length>150?`<button class="see-more-btn" onclick="event.stopPropagation();this.previousElementSibling.classList.toggle('expanded');this.textContent=this.previousElementSibling.classList.contains('expanded')?'Voir moins':'Voir plus...'">Voir plus...</button>`:''}`;
+        card.innerHTML=`<div class="post-card-header" onclick="event.stopPropagation();openVisitorProfile('${p.authorEmail||''}')"><div class="post-card-avatar">${av}</div><div class="post-card-user"><div class="post-card-username">${p.author||'Inconnu'}${p.isPremium?'<span class="premium-badge-small">PREMIUM</span>':''}</div><div class="post-card-date">${timeAgo(p.date)}</div></div></div><div class="post-card-body" onclick="openPostDetail('${p.firebaseKey}')">${p.photoUrl?`<img class="post-card-img" src="${p.photoUrl}" alt="" oncontextmenu="return false;"><div class="post-card-description">${descText}<button class="download-photo-btn" onclick="event.stopPropagation();downloadPhoto('${p.photoUrl}')"><i class="material-icons">download</i></button></div>`:`<div class="post-card-text-bg" style="background:${p.bg||'#1877f2'};">${linkedText}</div>`}</div><div class="post-card-actions" onclick="event.stopPropagation();"><button class="post-card-action-btn like-btn-${p.firebaseKey} ${p.liked?'liked':''}" onclick="likePost('${p.firebaseKey}',event)"><i class="material-icons">${p.liked?'favorite':'favorite_border'}</i> ${formatNumber(p.likes||0)}</button><button class="post-card-action-btn" onclick="openComments('${p.firebaseKey}')"><i class="material-icons">chat_bubble_outline</i> ${formatNumber((p.commentsList||[]).length)}</button><button class="post-card-action-btn" onclick="openShareModal('${p.firebaseKey}')"><i class="material-icons">share</i></button><button class="post-card-action-btn save-btn-${p.firebaseKey} ${p.saved?'saved':''}" onclick="savePost('${p.firebaseKey}')"><i class="material-icons">${p.saved?'bookmark':'bookmark_border'}</i></button></div>`;
+        return card;
+    }
+    function downloadPhoto(url){const a=document.createElement('a');a.href=url;a.download='likeyou_photo.jpg';document.body.appendChild(a);a.click();document.body.removeChild(a);}
+
+    function renderFeed(){
+        const c=document.getElementById('subscriptionsContent');
+        if(!isLoggedIn||!currentUser||!currentUser.profileCompleted){c.innerHTML='<p style="text-align:center;padding:40px;">Connecte-toi pour voir les publications</p>';return;}
+        let f=posts.filter(p=>!hiddenPosts.includes(p.firebaseKey));
+        f.sort((a,b)=>(b.likes||0)-(a.likes||0));
+        const mixed=[...f].sort(()=>Math.random()-0.4);
+        c.innerHTML='';
+        if(mixed.length===0){
+            c.innerHTML='<p style="text-align:center;padding:40px;">Aucune publication</p>';
+            document.getElementById('suggestionsSection').style.display='none';
+            document.getElementById('feedEnd').style.display='none';
+        }else{
+            mixed.forEach((p,i)=>{
+                c.appendChild(buildPostCardElement(p,i));
+                if(i===4){c.appendChild(document.getElementById('suggestionsSection'));renderSuggestions();}
+            });
+            if(mixed.length<=4){c.appendChild(document.getElementById('suggestionsSection'));renderSuggestions();}
+            document.getElementById('feedEnd').style.display='block';
+        }
+    }
+
+    function renderProfilePostsVertical(containerId,userEmail){
+        const container=document.getElementById(containerId);
+        if(!container)return;
+        let userPosts=posts.filter(p=>p.authorEmail===userEmail&&!hiddenPosts.includes(p.firebaseKey));
+        if(userPosts.length===0){container.innerHTML='<p style="text-align:center;padding:20px;">Aucune publication</p>';return;}
+        container.innerHTML='';
+        userPosts.sort((a,b)=>(b.likes||0)-(a.likes||0));
+        userPosts.forEach((p,i)=>container.appendChild(buildPostCardElement(p,i)));
+    }
+
+    function openVisitorProfile(email){
+        const u=accounts.find(a=>a.email===email);if(!u){showToast('Utilisateur introuvable','warning');return;}
+        profileViewingUser=u;
+        const c=document.getElementById('visitorProfileContent');
+        const totalLikes=posts.filter(p=>p.authorEmail===u.email).reduce((s,p)=>s+(p.likes||0),0);
+        const isFollowing=(currentUser?.following||[]).includes(u.email);
+        const isSelf=u.email===currentUser?.email;
+        c.innerHTML=`<div class="profile-cover" style="background:${u.coverUrl?`url(${u.coverUrl}) center/cover no-repeat`:(u.coverColor||'#1877f2')};"><div class="profile-pic-large">${u.avatarUrl?`<img src="${u.avatarUrl}">`:(u.name||u.firstName||'?').charAt(0)}</div><div style="position:absolute;bottom:-40px;right:16px;display:flex;gap:8px;">${!isSelf?`<button id="visitorFollowBtn" onclick="toggleFollowVisitor('${u.email}')" style="padding:10px 18px;border-radius:22px;border:none;font-weight:700;font-size:13px;cursor:pointer;background:${isFollowing?'#e4e6eb':'var(--primary)'};color:${isFollowing?'var(--text)':'white'};">${isFollowing?'Abonné ✓':'S\'abonner'}</button><button onclick="openChat('${u.email}','${u.name||u.firstName}')" style="padding:10px 18px;border-radius:22px;border:1px solid var(--border-subtle);background:var(--surface);color:var(--text);"><i class="material-icons">chat</i> Message</button>`:''}<button onclick="shareProfile('${u.username}')" style="padding:10px 18px;border-radius:22px;border:1px solid var(--border-subtle);background:var(--surface);"><i class="material-icons">share</i></button></div></div><div class="profile-info"><div class="profile-name-row"><span style="font-size:22px;font-weight:700;">${u.name||u.firstName||'Utilisateur'}</span>${u.isPremium?'<span class="premium-badge">PREMIUM</span>':''}</div><div style="color:var(--text-secondary);">${u.bio||''}</div>${u.whatsapp?`<a class="whatsapp-btn" href="https://wa.me/${u.whatsapp.replace(/[^0-9]/g,'')}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>`:''}<div class="profile-stats"><div class="stat-item" onclick="openListModal('Abonnés',getFollowersList('${u.email}'))"><span class="stat-number">${formatNumber(u.followers||0)}</span><span class="stat-label">Abonnés</span></div><div class="stat-item" onclick="openListModal('Abonnements',getFollowingList('${u.email}'))"><span class="stat-number">${formatNumber((u.following||[]).length)}</span><span class="stat-label">Abonnements</span></div><div class="stat-item"><span class="stat-number">${formatNumber(totalLikes)}</span><span class="stat-label">Likes</span></div></div><div id="visitorPostsTimeline" style="margin-top:20px;"></div></div>`;
+        document.getElementById('visitorProfileOverlay').classList.add('active');
+        renderProfilePostsVertical('visitorPostsTimeline',u.email);
+    }
+    function closeVisitorProfile(){document.getElementById('visitorProfileOverlay').classList.remove('active');}
+
+    function openProfileView(){
+        const c=document.getElementById('profileContent');
+        if(!isLoggedIn||!currentUser||!currentUser.profileCompleted){c.innerHTML='<p style="text-align:center;padding:40px;">Connecte-toi</p>';return;}
+        profileViewingUser=currentUser;
+        const totalLikes=posts.filter(p=>p.authorEmail===currentUser.email).reduce((s,p)=>s+(p.likes||0),0);
+        c.innerHTML=`<div class="profile-cover" id="profileCoverHeader" style="background:${currentUser.coverUrl?`url(${currentUser.coverUrl}) center/cover no-repeat`:(currentUser.coverColor||'#1877f2')};" onclick="triggerCoverUpload()"><div class="profile-pic-large" onclick="event.stopPropagation();triggerProfilePicUpload()">${currentUser.avatarUrl?`<img src="${currentUser.avatarUrl}">`:(currentUser.name||currentUser.firstName||'?').charAt(0)}</div><input type="file" id="coverInput" accept="image/*" onchange="handleCoverUpload(this)" style="display:none;"><input type="file" id="profilePicInput" accept="image/*" onchange="handleProfilePicUpload(this)" style="display:none;"></div><div class="profile-info"><div class="profile-name-row"><span style="font-size:22px;font-weight:700;">${currentUser.name||currentUser.firstName||'Utilisateur'}</span>${currentUser.isPremium?'<span class="premium-badge">PREMIUM</span>':''}</div><div>${currentUser.bio||''}</div>${currentUser.whatsapp?`<a class="whatsapp-btn" href="https://wa.me/${currentUser.whatsapp.replace(/[^0-9]/g,'')}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>`:''}<button onclick="shareProfile('${currentUser.username}')" style="margin-top:8px;background:var(--surface);border:1px solid var(--border-subtle);padding:8px 16px;border-radius:20px;"><i class="material-icons">share</i> Partager mon profil</button><div class="profile-stats"><div class="stat-item" onclick="openListModal('Abonnés',getFollowersList('${currentUser.email}'))"><span class="stat-number">${formatNumber(currentUser.followers||0)}</span><span class="stat-label">Abonnés</span></div><div class="stat-item" onclick="openListModal('Abonnements',getFollowingList('${currentUser.email}'))"><span class="stat-number">${formatNumber((currentUser.following||[]).length)}</span><span class="stat-label">Abonnements</span></div><div class="stat-item" onclick="openListModal('Likes',getLikedPostsList())"><span class="stat-number">${formatNumber(posts.filter(p=>p.liked).length)}</span><span class="stat-label">Likes</span></div><div class="stat-item" onclick="openListModal('Favoris',getSavedPostsList())"><span class="stat-number">${formatNumber(posts.filter(p=>p.saved).length)}</span><span class="stat-label">Favoris</span></div></div><div id="profilePostsTimeline" style="margin-top:20px;"></div></div>`;
+        renderProfilePostsVertical('profilePostsTimeline',currentUser.email);
+    }
+
+    function shareProfile(username){
+        const url=`${window.location.origin}${window.location.pathname}?u=${username}`;
+        if(navigator.share)navigator.share({title:`Profil de ${username}`,text:`Découvrez le profil de ${username} sur Like You`,url}).catch(()=>{});
+        else navigator.clipboard.writeText(url).then(()=>showToast('Lien du profil copié !'));
+    }
+
+    function toggleFollowVisitor(email){
+        if(!isLoggedIn||!currentUser||email===currentUser.email)return;
+        if(!currentUser.following)currentUser.following=[];
+        const idx=currentUser.following.indexOf(email);
+        db.ref('accounts').once('value').then(snap=>{
+            let t=null;
+            if(snap.exists()){const d=snap.val();Object.keys(d).forEach(k=>{if(d[k].email===email)t={firebaseKey:k,...d[k]};});}
+            if(!t)return;
+            if(t.followers===undefined)t.followers=0;
+            if(idx>=0){currentUser.following.splice(idx,1);t.followers=Math.max(0,t.followers-1);}
+            else{currentUser.following.push(email);t.followers=(t.followers||0)+1;t.newFollowers=(t.newFollowers||0)+1;}
+            profileViewingUser=t;
+            return Promise.all([saveAccountToFirebase(currentUser),saveAccountToFirebase(t)]);
+        }).then(()=>{updateNotificationBadges();if(currentPage==='profile')openProfileView();});
+    }
+
+    function getFollowersList(email){return accounts.filter(a=>(a.following||[]).includes(email)).map(a=>({name:a.name||a.firstName,email:a.email}));}
+    function getFollowingList(email){const u=accounts.find(a=>a.email===email);if(!u)return[];return accounts.filter(a=>a.email!==email&&(u.following||[]).includes(a.email)).map(a=>({name:a.name||a.firstName,email:a.email}));}
+    function getLikedPostsList(){return posts.filter(p=>p.liked).map(p=>({text:p.text||'Publication',firebaseKey:p.firebaseKey}));}
+    function getSavedPostsList(){return posts.filter(p=>p.saved).map(p=>({text:p.text||'Publication',firebaseKey:p.firebaseKey}));}
+    function openListModal(title,list){
+        document.getElementById('listModalTitle').textContent=title;
+        document.getElementById('listModalContent').innerHTML=list.length===0?'<p style="text-align:center;">Aucun</p>':list.map(item=>item.email?`<div class="user-list-item" onclick="openVisitorProfile('${item.email}');closeListModal();">${item.name||'?'}</div>`:`<div class="activity-item" onclick="openPostDetail('${item.firebaseKey}');closeListModal();">${item.text}</div>`).join('');
+        document.getElementById('listModal').classList.add('active');
+    }
+    function closeListModal(){document.getElementById('listModal').classList.remove('active');}
+
+    function renderCreateForm(){
+        const c=document.getElementById('createContent');
+        if(!isLoggedIn||!currentUser||!currentUser.profileCompleted||currentUser.isAnonymous){c.innerHTML='<p style="text-align:center;padding:40px;">'+(currentUser?.isAnonymous?'Les invités ne peuvent pas publier.':'Connecte-toi et complète ton profil.')+'</p>';return;}
+        c.innerHTML=`<div style="padding:16px;"><div style="display:flex;gap:10px;margin-bottom:10px;"><button id="typePhotoBtn" onclick="setPubType('photo')" style="flex:1;padding:12px;border-radius:12px;border:2px solid var(--primary);background:var(--primary);color:white;font-weight:600;">Photo + Description</button><button id="typeTextBtn" onclick="setPubType('text')" style="flex:1;padding:12px;border-radius:12px;border:2px solid var(--border-subtle);background:var(--surface);color:var(--text);font-weight:600;">Texte seul</button></div><div id="photoUploadContainer"><div class="image-upload-area" onclick="document.getElementById('photoInput').click()"><i class="material-icons">add_photo_alternate</i><img id="photoPreview" class="image-preview" style="display:none;"></div><input type="file" id="photoInput" accept="image/*" onchange="handlePhotoUpload(this)" style="display:none;"></div><div id="colorPickerTextContainer" style="display:none;"><div class="color-simple-grid" id="colorSimpleGrid"></div></div><textarea id="newDescription" maxlength="500" placeholder="Partagez votre innovation ou expérience... (max 500 caractères)" style="width:100%;height:80px;margin-top:10px;"></textarea><button class="btn-primary" onclick="publishPost()">Publier</button></div>`;
+        initCreateForm();
+    }
+
+    let pubType='photo';
+    function setPubType(t){pubType=t;document.getElementById('typePhotoBtn').style.background=t==='photo'?'var(--primary)':'var(--surface)';document.getElementById('typePhotoBtn').style.color=t==='photo'?'white':'var(--text)';document.getElementById('typeTextBtn').style.background=t==='text'?'var(--primary)':'var(--surface)';document.getElementById('typeTextBtn').style.color=t==='text'?'white':'var(--text)';document.getElementById('photoUploadContainer').style.display=t==='photo'?'block':'none';document.getElementById('colorPickerTextContainer').style.display=t==='text'?'block':'none';}
+    function initCreateForm(){uploadedPhotoData=null;document.getElementById('photoPreview').style.display='none';document.getElementById('colorSimpleGrid').innerHTML=PRO_COLORS.map(c=>`<div class="color-simple-option ${c===selectedColor?'selected':''}" style="background:${c};" onclick="selectColor('${c}',this)"></div>`).join('');setPubType('photo');}
+    function selectColor(c,el){selectedColor=c;document.querySelectorAll('#colorSimpleGrid .color-simple-option').forEach(o=>o.classList.remove('selected'));el.classList.add('selected');}
+    function handlePhotoUpload(i){const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{uploadedPhotoData=e.target.result;document.getElementById('photoPreview').src=uploadedPhotoData;document.getElementById('photoPreview').style.display='block';};r.readAsDataURL(f);}
+    function publishPost(){
+        if(!isLoggedIn||!currentUser||!currentUser.profileCompleted||currentUser.isAnonymous)return;
+        const text=document.getElementById('newDescription').value.trim();
+        if(text.length>500){showToast('Maximum 500 caractères','warning');return;}
+        if(!text&&pubType==='text'){showToast('Écris une description','warning');return;}
+        if(pubType==='photo'&&!uploadedPhotoData){showToast('Ajoute une photo','warning');return;}
+        const np={id:nextId++,author:currentUser.name||currentUser.firstName,authorEmail:currentUser.email,avatarUrl:currentUser.avatarUrl,isPremium:currentUser.isPremium||false,date:new Date().toISOString(),text,photoUrl:pubType==='photo'?uploadedPhotoData:null,bg:pubType==='text'?selectedColor:'#f0f2f5',likes:0,likedBy:[],commentsList:[],saved:false,liked:false};
+        savePostToFirebase(np).then(()=>{showToast('Publié!','success');renderCreateForm();navigateTo('feed');});
+    }
+
+    function renderMenu(){
+        const c=document.getElementById('menuContent');
+        if(!isLoggedIn){c.innerHTML='<p style="text-align:center;">Connecte-toi</p>';return;}
+        c.innerHTML=`<div class="page-header"><h3>Menu</h3></div><div class="menu-section"><div class="menu-item" onclick="openEditProfileFull()"><div class="menu-icon icon-edit"><i class="material-icons">edit</i></div><span class="menu-label">Éditer profil</span><span class="menu-arrow"><i class="material-icons">chevron_right</i></span></div><div class="menu-item" onclick="openActivitySection()"><div class="menu-icon icon-activity"><i class="material-icons">history</i></div><span class="menu-label">Activité</span><span class="menu-arrow"><i class="material-icons">chevron_right</i></span></div><div class="menu-item" onclick="openConfidentiality()"><div class="menu-icon icon-confidentialite"><i class="material-icons">lock</i></div><span class="menu-label">Confidentialité</span><span class="menu-arrow"><i class="material-icons">chevron_right</i></span></div><div class="menu-item" onclick="openHiddenPosts()"><div class="menu-icon icon-hidden"><i class="material-icons">visibility_off</i></div><span class="menu-label">Masquées</span><span class="menu-arrow"><i class="material-icons">chevron_right</i></span></div><div class="menu-item" onclick="openPremiumModal()"><div class="menu-icon icon-premium"><i class="material-icons">workspace_premium</i></div><span class="menu-label">Premium</span><span class="menu-arrow"><i class="material-icons">chevron_right</i></span></div><div class="menu-item" onclick="openAccountModal()"><div class="menu-icon" style="background:#e3f2fd;color:#1877f2;"><i class="material-icons">account_circle</i></div><span class="menu-label">Compte</span><span class="menu-arrow"><i class="material-icons">chevron_right</i></span></div><div class="menu-item" onclick="openReviewsModal()"><div class="menu-icon" style="background:#fff9c4;color:#f57f17;"><i class="material-icons">rate_review</i></div><span class="menu-label">Avis</span><span class="menu-arrow"><i class="material-icons">chevron_right</i></span></div><div class="menu-item" onclick="openThanksModal()"><div class="menu-icon" style="background:#e8f5e9;color:#2ecc71;"><i class="material-icons">favorite</i></div><span class="menu-label">Mentions et Remerciements</span><span class="menu-arrow"><i class="material-icons">chevron_right</i></span></div><div class="menu-item" onclick="openInfoModal()"><div class="menu-icon icon-info"><i class="material-icons">info</i></div><span class="menu-label">Info</span><span class="menu-arrow"><i class="material-icons">chevron_right</i></span></div><div class="menu-item" onclick="openContactModal()"><div class="menu-icon icon-contact"><i class="material-icons">support_agent</i></div><span class="menu-label">Contacter développeurs</span><span class="menu-arrow"><i class="material-icons">chevron_right</i></span></div><div class="menu-item" onclick="logout()"><div class="menu-icon icon-logout"><i class="material-icons">logout</i></div><span class="menu-label">Déconnexion</span><span class="menu-arrow"><i class="material-icons">chevron_right</i></span></div></div>`;
+    }
+
+    function openAccountModal(){
+        const info=document.getElementById('accountInfo');
+        info.innerHTML=`<p><strong>Email :</strong> ${currentUser?.email||'Inconnu'}</p><p>Pour supprimer votre compte, veuillez contacter <a href="mailto:likeyou.cd@gmail.com">likeyou.cd@gmail.com</a>.</p><p>Pour toute demande, question ou problème technique, écrivez-nous à cette même adresse.</p>`;
+        document.getElementById('accountModal').classList.add('active');
+    }
+    function closeAccountModal(){document.getElementById('accountModal').classList.remove('active');}
+
+    function openReviewsModal(){
+        document.getElementById('reviewsModal').classList.add('active');
+        loadReviews();
+    }
+    function closeReviewsModal(){document.getElementById('reviewsModal').classList.remove('active');}
+    function loadReviews(){
+        const list=document.getElementById('reviewsList');
+        db.ref('reviews').on('value',snap=>{
+            let html='';
+            if(snap.exists()){
+                const data=snap.val();
+                const arr=Object.keys(data).map(k=>({key:k,...data[k]}));
+                arr.sort((a,b)=>b.likes-a.likes);
+                html=arr.map(r=>`<div class="review-item"><div class="review-author">${r.author||'Anonyme'}</div><div class="review-text">${r.text}</div><div style="display:flex;align-items:center;gap:4px;"><button class="post-card-action-btn" onclick="likeReview('${r.key}')"><i class="material-icons" style="font-size:18px;">favorite_border</i> ${r.likes||0}</button></div></div>`).join('');
+            }else html='<p style="text-align:center;">Aucun avis pour le moment.</p>';
+            list.innerHTML=html;
+        });
+    }
+    function submitReview(){
+        const text=document.getElementById('reviewInput').value.trim();
+        if(!text)return;
+        if(text.length>120){showToast('Maximum 120 caractères','warning');return;}
+        const author=currentUser?.name||currentUser?.firstName||'Anonyme';
+        db.ref('reviews').push({author,text,likes:0}).then(()=>{
+            document.getElementById('reviewInput').value='';
+            showToast('Avis publié','success');
+        });
+    }
+    function likeReview(key){
+        db.ref('reviews/'+key).once('value').then(snap=>{
+            if(snap.exists()){
+                const r=snap.val();
+                r.likes=(r.likes||0)+1;
+                return db.ref('reviews/'+key).update({likes:r.likes});
+            }
+        });
+    }
+
+    function openThanksModal(){document.getElementById('thanksModal').classList.add('active');}
+    function closeThanksModal(){document.getElementById('thanksModal').classList.remove('active');}
+
+    function getChatId(e1,e2){return[e1,e2].sort().join('_');}
+    function openChat(email,name){
+        if(!isLoggedIn||!currentUser)return;chatWithEmail=email;
+        document.getElementById('chatTitle').textContent=name||email;
+        document.getElementById('chatMessages').innerHTML='';document.getElementById('chatInput').value='';
+        document.getElementById('chatOverlay').classList.add('active');
+        if(chatListener)db.ref('chats/'+getChatId(currentUser.email,email)).off('value',chatListener);
+        chatListener=snap=>{const div=document.getElementById('chatMessages');div.innerHTML='';if(snap.exists()){const msgs=snap.val();Object.keys(msgs).sort((a,b)=>msgs[a].timestamp-msgs[b].timestamp).forEach(k=>{const m=msgs[k];const el=document.createElement('div');el.className='chat-message'+(m.sender===currentUser.email?' own':'');el.textContent=m.text;div.appendChild(el);});div.scrollTop=div.scrollHeight;}};
+        db.ref('chats/'+getChatId(currentUser.email,email)).on('value',chatListener);
+    }
+    function closeChat(){document.getElementById('chatOverlay').classList.remove('active');if(chatListener){db.ref('chats/'+getChatId(currentUser.email,chatWithEmail)).off('value',chatListener);chatListener=null;}chatWithEmail=null;}
+    function sendChatMessage(){
+        if(sendingMessage)return;
+        const text=document.getElementById('chatInput').value.trim();
+        if(!text||!chatWithEmail||!currentUser)return;
+        sendingMessage=true;document.getElementById('chatSendBtn').disabled=true;
+        db.ref('chats/'+getChatId(currentUser.email,chatWithEmail)).push({sender:currentUser.email,text,timestamp:Date.now()}).then(()=>{document.getElementById('chatInput').value='';}).finally(()=>{sendingMessage=false;document.getElementById('chatSendBtn').disabled=false;});
+    }
+
+    function openSearch(){document.getElementById('searchOverlay').classList.add('active');document.getElementById('searchOverlayInput').focus();switchSearchTab('publications');}
+    function closeSearch(){document.getElementById('searchOverlay').classList.remove('active');}
+    function switchSearchTab(tab){currentSearchTab=tab;document.querySelectorAll('.search-tab').forEach(t=>t.classList.remove('active'));document.querySelector(`.search-tab[data-search-tab="${tab}"]`)?.classList.add('active');document.getElementById('searchResultsPublications').style.display=tab==='publications'?'block':'none';document.getElementById('searchResultsAutres').style.display=tab==='autres'?'block':'none';if(tab==='publications')performSearch();}
+    function performSearch(){
+        const q=document.getElementById('searchOverlayInput').value.trim().toLowerCase();
+        const resultsDiv=document.getElementById('searchResultsPublications');
+        if(!q){resultsDiv.innerHTML='';return;}
+        const filtered=posts.filter(p=>(p.text||'').toLowerCase().includes(q)&&!hiddenPosts.includes(p.firebaseKey));
+        resultsDiv.innerHTML=filtered.length===0?'<p style="text-align:center;padding:20px;">Aucun résultat</p>':filtered.map(p=>`<div class="post-card" data-key="${p.firebaseKey}"><div class="post-card-body" onclick="openPostDetail('${p.firebaseKey}');closeSearch();">${p.text?`<div class="post-card-text-bg" style="background:${p.bg||'#1877f2'};">${p.text}</div>`:''}</div></div>`).join('');
+    }
+
+    function refreshFeed(){if(isRefreshing)return;isRefreshing=true;db.ref('posts').once('value').then(snap=>{posts=[];if(snap.exists()){const d=snap.val();Object.keys(d).forEach(k=>posts.push({firebaseKey:k,...d[k]}));}nextId=posts.reduce((m,p)=>Math.max(m,p.id||0),0)+1;renderFeed();isRefreshing=false;showToast('Actualisé!','success');});}
+    function renderUsersList(f=''){const c=document.getElementById('usersList');let fa=[...accounts];if(f){const q=f.toLowerCase();fa=fa.filter(a=>(a.name||'').toLowerCase().includes(q)||(a.email||'').toLowerCase().includes(q));}c.innerHTML=fa.length===0?'<p style="text-align:center;">Aucun</p>':fa.map(a=>`<div class="user-list-item" onclick="openVisitorProfile('${a.email}')"><div class="user-list-avatar">${a.avatarUrl?`<img src="${a.avatarUrl}">`:(a.name||a.firstName||'?').charAt(0)}</div><div class="user-list-info"><div class="user-list-name">${a.name||a.firstName||'Utilisateur'}${a.isPremium?'<span class="premium-badge-small">PREMIUM</span>':''}</div></div></div>`).join('');}
+    function searchUsers(){renderUsersList(document.getElementById('userSearchInput').value.trim());}
+
+    async function loginWithGoogle(){
+        try{
+            await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+            // L'écran d'authentification sera caché par onAuthStateChanged
+        }catch(e){showToast('Erreur Google: '+e.message,'error');}
+    }
+    async function loginAnonymously(){
+        try{
+            const result=await auth.signInAnonymously();
+            const uid=result.user.uid;
+            // Déterminer le prochain numéro
+            const snap=await db.ref('anonymousCounter').once('value');
+            let nextNum=(snap.val()||0)+1;
+            await db.ref('anonymousCounter').set(nextNum);
+            const username=`likeyou${nextNum}@kituka`;
+            // Mettre à jour le profil
+            await result.user.updateProfile({displayName:username});
+            // Le reste sera fait dans onAuthStateChanged
+        }catch(e){showToast('Erreur anonyme: '+e.message,'error');}
+    }
+    async function loginWithEmail(){
+        const e=document.getElementById('loginEmail').value.trim(),p=document.getElementById('loginPassword').value.trim();
+        if(!e||!p){showToast('Remplis tous les champs','warning');return;}
+        try{
+            await auth.signInWithEmailAndPassword(e,p);
+        }catch(x){showToast('Erreur: '+x.message,'error');}
+    }
+    async function registerWithEmail(){
+        const n=document.getElementById('regName').value.trim(),e=document.getElementById('regEmail').value.trim(),p=document.getElementById('regPassword').value.trim();
+        if(!n||!e||!p)return showToast('Remplis tous les champs','warning');
+        try{
+            const cred=await auth.createUserWithEmailAndPassword(e,p);
+            await cred.user.updateProfile({displayName:n});
+            switchAuthTab('login');
+            showToast('Compte créé ! Connectez-vous.','success');
+        }catch(x){showToast('Erreur: '+x.message,'error');}
+    }
+
+    function showCompleteProfileModal(){document.getElementById('completeProfileModal').classList.add('active');if(countriesList.length===0)fetchCountries().then(()=>populateCountrySelect('cpCountry'));else populateCountrySelect('cpCountry');}
+    async function submitCompleteProfile(){
+        const fn=document.getElementById('cpFirstName').value.trim(),ln=document.getElementById('cpLastName').value.trim(),bd=document.getElementById('cpBirthdate').value,g=document.querySelector('input[name="cpGender"]:checked')?.value,co=document.getElementById('cpCountry').value,ac=document.getElementById('cpAcceptConditions').checked;
+        if(!fn||!ln||!bd||!g||!co)return showToast('Tous les champs requis','warning');
+        if(!ac)return showToast('Accepte les conditions','warning');
+        if(getAge(bd)<16)return showToast('16 ans minimum','error');
+        const fullName=fn+' '+ln;
+        currentUser.firstName=fn;currentUser.lastName=ln;currentUser.name=fullName;
+        if(!currentUser.username)currentUser.username=await suggestUniqueUsername(fn.toLowerCase());
+        currentUser.birthdate=bd;currentUser.gender=g;currentUser.country=co;currentUser.profileCompleted=true;
+        await saveAccountToFirebase(currentUser);
+        if(!accounts.find(a=>a.email===currentUser.email))accounts.push(currentUser);
+        isLoggedIn=true;
+        document.getElementById('completeProfileModal').classList.remove('active');
+        showToast('Profil complété!','success');
+        hideAuthScreen();pageStack=['feed'];navigateTo('feed',false);updateBackButtonVisibility();
+    }
+
+    function openConditions(){document.getElementById('conditionsModal').classList.add('active');}
+    function closeConditions(){document.getElementById('conditionsModal').classList.remove('active');}
+    function openPremiumModal(){document.getElementById('premiumModal').classList.add('active');}
+    function closePremiumModal(){document.getElementById('premiumModal').classList.remove('active');}
+    function goToPremiumPayment(){window.open('https://www.paypal.com/paypalme/reletcom/7.99','_blank');}
+    function openInfoModal(){document.getElementById('infoModal').classList.add('active');}
+    function closeInfoModal(){document.getElementById('infoModal').classList.remove('active');}
+    function openContactModal(){document.getElementById('contactModal').classList.add('active');}
+    function closeContactModal(){document.getElementById('contactModal').classList.remove('active');}
+    function openConfidentiality(){
+        document.getElementById('confProfileVisibility').value=currentUser.profileVisibility||'public';
+        document.getElementById('confPostsVisibility').value=currentUser.postsVisibility||'public';
+        document.getElementById('confidentialityModal').classList.add('active');
+    }
+    function closeConfidentiality(){document.getElementById('confidentialityModal').classList.remove('active');}
+    function saveConfidentiality(){
+        currentUser.profileVisibility=document.getElementById('confProfileVisibility').value;
+        currentUser.postsVisibility=document.getElementById('confPostsVisibility').value;
+        saveAccountToFirebase(currentUser).then(()=>{closeConfidentiality();showToast('Confidentialité mise à jour','success');});
+    }
+
+    function openEditProfileFull(){
+        if(currentUser.isAnonymous){showToast('Invités ne peuvent pas modifier le profil','warning');return;}
+        document.getElementById('editName').value=currentUser.name||'';
+        document.getElementById('editBio').value=currentUser.bio||'';
+        document.getElementById('editWhatsapp').value=currentUser.whatsapp||'';
+        document.getElementById('editProfileModal').classList.add('active');
+    }
+    function closeEditProfile(){document.getElementById('editProfileModal').classList.remove('active');}
+    function saveProfile(){
+        if(currentUser.isAnonymous){showToast('Invités ne peuvent pas modifier le profil','warning');return;}
+        const newName=document.getElementById('editName').value.trim();
+        if(newName&&newName!==(currentUser.name||'')){
+            const now=Date.now();
+            const lastChange=currentUser.lastNameChange||0;
+            if(now-lastChange<30*24*60*60*1000){showToast('Tu dois attendre 30 jours avant de changer ton nom.','warning');return;}
+            currentUser.name=newName;currentUser.lastNameChange=now;
+        }
+        currentUser.bio=document.getElementById('editBio').value;
+        currentUser.whatsapp=document.getElementById('editWhatsapp').value;
+        saveAccountToFirebase(currentUser).then(()=>{closeEditProfile();openProfileView();showToast('Profil mis à jour','success');});
+    }
+
+    function editPost(k){const p=getPostByKey(k);if(!p||p.authorEmail!==currentUser?.email)return;document.getElementById('editPostId').value=k;document.getElementById('editDescription').value=p.text||'';document.getElementById('editPostModal').classList.add('active');}
+    function closeEditPostModal(){document.getElementById('editPostModal').classList.remove('active');}
+    function saveEditedPost(){const k=document.getElementById('editPostId').value;const p=getPostByKey(k);if(!p||p.authorEmail!==currentUser?.email)return;p.text=document.getElementById('editDescription').value.trim();savePostToFirebase(p).then(()=>{closeEditPostModal();refreshFeed();showToast('Modifié','success');});}
+    function deletePost(k){const p=getPostByKey(k);if(!p||p.authorEmail!==currentUser?.email)return;if(!confirm('Supprimer?'))return;deletePostFromFirebase(k).then(()=>{posts=posts.filter(x=>x.firebaseKey!==k);refreshFeed();});}
+    function hidePost(k){if(!hiddenPosts.includes(k)){hiddenPosts.push(k);if(currentUser)currentUser.hiddenPosts=hiddenPosts;saveAccountToFirebase(currentUser);}refreshFeed();}
+    function unhidePost(k){hiddenPosts=hiddenPosts.filter(h=>h!==k);if(currentUser)currentUser.hiddenPosts=hiddenPosts;saveAccountToFirebase(currentUser);refreshFeed();openHiddenPosts();}
+    function openHiddenPosts(){document.getElementById('hiddenPostsModal').classList.add('active');document.getElementById('hiddenPostsList').innerHTML=hiddenPosts.length===0?'<p>Aucune</p>':hiddenPosts.map(k=>`<button onclick="unhidePost('${k}')">Démasquer</button>`).join('');}
+    function closeHiddenPosts(){document.getElementById('hiddenPostsModal').classList.remove('active');}
+
+    function triggerCoverUpload(){document.getElementById('coverInput')?.click();}
+    function triggerProfilePicUpload(){document.getElementById('profilePicInput')?.click();}
+    function handleCoverUpload(i){const f=i.files[0];if(!f||!currentUser)return;const r=new FileReader();r.onload=e=>{currentUser.coverUrl=e.target.result;saveAccountToFirebase(currentUser);openProfileView();};r.readAsDataURL(f);}
+    function handleProfilePicUpload(i){
+        if(!currentUser||currentUser.isAnonymous)return;
+        const f=i.files[0];if(!f)return;
+        const now=Date.now();const lastChange=currentUser.lastPhotoChange||0;
+        if(now-lastChange<7*24*60*60*1000){showToast('Tu dois attendre 7 jours avant de changer ta photo.','warning');return;}
+        const r=new FileReader();
+        r.onload=e=>{currentUser.avatarUrl=e.target.result;currentUser.lastPhotoChange=now;saveAccountToFirebase(currentUser);openProfileView();};
+        r.readAsDataURL(f);
+    }
+
+    function openActivitySection(){
+        const likedPosts=posts.filter(p=>p.liked);const savedPosts=posts.filter(p=>p.saved);
+        let html='<div class="page-header"><h3>Activité</h3><button onclick="navigateTo(\'menu\')"><i class="material-icons">arrow_back</i></button></div><div style="padding:16px;">';
+        html+=`<h4><i class="material-icons" style="color:var(--primary);">favorite</i> J'aime (${likedPosts.length})</h4>`;
+        if(likedPosts.length===0)html+='<p>Aucun j\'aime</p>';else likedPosts.forEach(p=>html+=`<div class="activity-item" onclick="openPostDetail('${p.firebaseKey}')"><i class="material-icons" style="color:var(--primary);">favorite</i> ${p.text||'Publication'}</div>`);
+        html+=`<h4 style="margin-top:16px;"><i class="material-icons" style="color:#f7b928;">bookmark</i> Favoris (${savedPosts.length})</h4>`;
+        if(savedPosts.length===0)html+='<p>Aucun favori</p>';else savedPosts.forEach(p=>html+=`<div class="activity-item" onclick="openPostDetail('${p.firebaseKey}')"><i class="material-icons" style="color:#f7b928;">bookmark</i> ${p.text||'Publication'}</div>`);
+        html+='</div>';document.getElementById('menuContent').innerHTML=html;
+    }
+
+    function logout(){auth.signOut().then(()=>{isLoggedIn=false;currentUser=getDefaultUser();newFollowersCount=0;hiddenPosts=[];updateNotificationBadges();showAuthScreen();showToast('Déconnecté','info');});}
+
+    function openPostDetail(k){const p=getPostByKey(k);if(!p)return;currentPostId=k;document.getElementById('postDetailBg').innerHTML=p.photoUrl?`<img src="${p.photoUrl}" style="max-height:70vh;">`:'';document.getElementById('postDetailText').innerHTML=p.text?`"${linkifyText(p.text)}"`:'';document.getElementById('postDetailOverlay').classList.add('active');}
+    function closePostDetail(){document.getElementById('postDetailOverlay').classList.remove('active');}
+
+    function openComments(k){currentPostId=k;const p=getPostByKey(k);if(!p)return;document.getElementById('commentsList').innerHTML=(p.commentsList||[]).length===0?'<p>Aucun</p>':p.commentsList.map(c=>`<div><strong>${c.name}</strong> ${c.text}</div>`).join('');document.getElementById('commentsOverlay').classList.add('active');}
+    function closeComments(){document.getElementById('commentsOverlay').classList.remove('active');}
+    function addComment(){
+        if(!currentPostId)return;
+        const t=document.getElementById('commentInput').value.trim();if(!t)return;
+        const p=getPostByKey(currentPostId);if(!p)return;
+        if(!p.commentsList)p.commentsList=[];
+        p.commentsList.push({name:currentUser?.name||'Invité',text:t,time:'À l\'instant'});
+        document.getElementById('commentInput').value='';
+        savePostToFirebase(p).then(()=>{openComments(currentPostId);if(p.authorEmail!==currentUser.email)addNotification('comment',currentUser.email,p.firebaseKey);});
+    }
+
+    function openShareModal(k){currentPostId=k;document.getElementById('shareModal').classList.add('active');const p=getPostByKey(k);if(p){document.getElementById('qrContainer').innerHTML='';setTimeout(()=>new QRCode(document.getElementById('qrContainer'),{text:window.location.href.split('?')[0]+'?post='+p.id,width:150,height:150}),100);}}
+    function closeShareModal(){document.getElementById('shareModal').classList.remove('active');}
+
+    let isLikingPost=false;
+    function likePost(k,ev){
+        if(!isLoggedIn||!currentUser||!currentUser.profileCompleted){showToast('Connecte-toi','warning');return;}
+        if(isLikingPost)return;
+        ev.stopPropagation();isLikingPost=true;
+        const p=getPostByKey(k);if(!p){isLikingPost=false;return;}
+        if(!p.likedBy)p.likedBy=[];
+        const email=currentUser.email;
+        const al=p.likedBy.find(l=>l.email===email);
+        if(al){p.likedBy=p.likedBy.filter(l=>l.email!==email);p.likes=Math.max(0,(p.likes||0)-1);p.liked=false;}
+        else{p.likedBy.push({name:currentUser.name||currentUser.firstName,email});p.likes=(p.likes||0)+1;p.liked=true;playLikeSound();if(p.authorEmail&&p.authorEmail!==currentUser.email)addNotification('like',currentUser.email,p.firebaseKey);}
+        savePostToFirebase(p).then(()=>{document.querySelectorAll(`.like-btn-${k}`).forEach(b=>{b.classList.toggle('liked',p.liked);b.querySelector('i').textContent=p.liked?'favorite':'favorite_border';});isLikingPost=false;}).catch(()=>{isLikingPost=false;});
+    }
+
+    function savePost(k){
+        const p=getPostByKey(k);if(!p)return;
+        p.saved=!p.saved;p.saves=(p.saves||0)+(p.saved?1:-1);playSaveSound();
+        if(p.saved&&p.authorEmail!==currentUser.email)addNotification('save',currentUser.email,p.firebaseKey);
+        savePostToFirebase(p).then(()=>{document.querySelectorAll(`.save-btn-${k}`).forEach(b=>{b.classList.toggle('saved',p.saved);b.querySelector('i').textContent=p.saved?'bookmark':'bookmark_border';});});
+    }
+
+    function showAuthScreen(){document.getElementById('authScreen').classList.remove('hidden');document.getElementById('appContainer').style.display='none';}
+    function hideAuthScreen(){document.getElementById('authScreen').classList.add('hidden');document.getElementById('appContainer').style.display='flex';}
+    function switchAuthTab(tab){
+        document.getElementById('authScreenContent').style.display=tab==='login'?'block':'none';
+        document.getElementById('registerScreenContent').style.display=tab==='register'?'block':'none';
+    }
+
+    auth.onAuthStateChanged(async u=>{
+        if(u){
+            const email=u.email||(u.isAnonymous?`anonymous_${u.uid}@likeyou.app`:null);
+            if(!email)return;
+            localStorage.setItem('shorttxt_last_email',email);
+            await loadAccounts();
+            let ex=accounts.findIndex(a=>a.email===email);
+            if(ex>=0){
+                currentUser=accounts[ex];
+                if(!currentUser.following)currentUser.following=[];
+                if(currentUser.newFollowers===undefined)currentUser.newFollowers=0;
+                if(!currentUser.hiddenPosts)currentUser.hiddenPosts=[];
+                if(!currentUser.profileVisibility)currentUser.profileVisibility='public';
+                if(!currentUser.postsVisibility)currentUser.postsVisibility='public';
+                newFollowersCount=currentUser.newFollowers||0;
+                hiddenPosts=currentUser.hiddenPosts||[];
+                isLoggedIn=true;
+                if(u.isAnonymous&&!currentUser.isAnonymous){currentUser.isAnonymous=true;currentUser.name=u.displayName||'Invité';await saveAccountToFirebase(currentUser);}
+            }else{
+                currentUser=getDefaultUser();
+                currentUser.email=email;
+                currentUser.name=u.displayName||(u.isAnonymous?'Invité':'');
+                currentUser.avatarUrl=u.photoURL||'';
+                currentUser.isAnonymous=u.isAnonymous;
+                if(u.isAnonymous){
+                    currentUser.username='anonymous_'+u.uid.substring(0,8);
+                    currentUser.name=u.displayName; // déjà défini par loginAnonymously
+                    currentUser.profileCompleted=true;
+                }else{
+                    const base=(currentUser.name||'user').toLowerCase().replace(/[^a-z0-9_]/g,'_').substring(0,20)||'user';
+                    currentUser.username=await suggestUniqueUsername(base);
+                }
+                accounts.push(currentUser);
+                isLoggedIn=true;
+                await saveAccountToFirebase(currentUser);
+            }
+            updateNotificationBadges();
+            loadNotifications();
+            if(!currentUser.profileCompleted&&!currentUser.isAnonymous){hideAuthScreen();showCompleteProfileModal();}
+            else{hideAuthScreen();pageStack=['feed'];navigateTo('feed',false);checkURLParams();}
+        }else{
+            isLoggedIn=false;currentUser=getDefaultUser();newFollowersCount=0;hiddenPosts=[];
+            updateNotificationBadges();showAuthScreen();
+        }
+    });
+
+    function checkURLParams(){
+        const params=new URLSearchParams(window.location.search);
+        const username=params.get('u');
+        if(username){const user=accounts.find(a=>a.username===username);if(user)setTimeout(()=>openVisitorProfile(user.email),500);else showToast('Profil introuvable','warning');}
+    }
+
+    async function init(){
+        await fetchCountries();
+        initAutoTheme();
+        initializePosts();
+        checkURLParams();
+        const mc=document.getElementById('mainContent');let sy=0,pl=false;
+        mc.addEventListener('touchstart',e=>{if(mc.scrollTop<=5){sy=e.touches[0].clientY;pl=true;}},{passive:true});
+        mc.addEventListener('touchmove',e=>{if(pl&&!isRefreshing&&e.touches[0].clientY-sy>60)document.getElementById('subPullRefresh').style.display='block';},{passive:true});
+        mc.addEventListener('touchend',()=>{if(pl&&document.getElementById('subPullRefresh').style.display==='block'&&!isRefreshing)refreshFeed();pl=false;});
+        window.addEventListener('popstate',e=>{if(e.state&&e.state.page)navigateTo(e.state.page,false);else goBack();});
+    }
+
+    document.addEventListener('click',e=>{
+        if(!e.target.closest('#appTitleBtn')&&!e.target.closest('#appDescriptionTooltip'))document.getElementById('appDescriptionTooltip').classList.remove('visible');
+    });
+    document.addEventListener('keydown',e=>{
+        if(e.key==='Escape'){
+            ['editPostModal','shareModal','commentsOverlay','hiddenPostsModal','editProfileModal','premiumModal','conditionsModal','completeProfileModal','confidentialityModal','infoModal','contactModal','listModal','accountModal','reviewsModal','thanksModal'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('active');});
+            closePostDetail();closeVisitorProfile();closeChat();closeSearch();closeNotifications();
+        }
+    });
+    init();
+</script>
+</body>
+</html>
